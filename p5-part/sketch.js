@@ -1,13 +1,21 @@
+/*
+References for these codes:
+https://itp.nyu.edu/physcomp/labs/labs-serial-communication/lab-serial-input-to-the-p5-js-ide/
+https://itp.nyu.edu/physcomp/labs/labs-serial-communication/lab-serial-input-to-the-p5-js-ide/
+*/
+
 var serial;          // variable to hold an instance of the serialport library
 var portName = '/dev/cu.usbserial-DN01DW79';  // fill in your serial port name here
-var inData;
-var outData = 0;
-var minWidth = 600;
+var inData;   // variable to hold the input data from Arduino
+var outData = 0;  // variable to hold the output data to Arduino
+
+var minWidth = 600;   //set min width and height for canvas
 var minHeight = 400;
-var rightSlider;
-var width, height;
+var rightSlider;    // slider for controlling
+var width, height;    // actual width and height for the sketch
 
 function setup() {
+  // set the canvas to match the window size
   if (window.innerWidth > minWidth){
     width = window.innerWidth;
   } else {
@@ -18,6 +26,7 @@ function setup() {
   } else {
     height = minHeight;
   }
+
   //set up canvas
   createCanvas(width, height);
   noStroke();
@@ -40,30 +49,32 @@ function setup() {
 }
 
 function draw() {
-  // draw the separate
+  // set background to black
   background(0);
-  // left side
-  var leftBrightness = map(inData, 0, 255, 0, 255);
-  fill(leftBrightness);
-  rect(0,0,width/2,height);
 
-  // draw the text
-  var textLColor = map(leftBrightness, 0, 255, 255,0);
+  // drawing the left side to visualize my LED light
+  var leftBrightness = map(inData, 0, 255, 0, 255);   // map input to the correct range of brightness
+  fill(leftBrightness);   // transfer the brightness to brightness of the color used for drawing
+  rect(0,0,width/2,height);   // left half
+
+  // draw the text - left
+  var textLColor = map(leftBrightness, 0, 255, 255,0);  // inverse the color for drawing the text on background
   fill(textLColor);
   textSize(16);
   text("THE OTHER SIDE", 30, 30);
   textSize(12);
-  text("BRIGHTNESS LEVEL: " + inData, 30, 50);
+  text("BRIGHTNESS LEVEL: " + inData, 30, 50);    // displaying the input
 
-  // right side
-  var rightBrightness = map(rightSlider.value(), 0, 255, 0, 255);
-  //var rightBrightness = 0;
+  // right side setup, using a variable for Part 3 purpose, currently it does not change
+  var rightBrightness = map(rightSlider.value(), 0, 255, 0, 255);   // read the value from slider and write to visualization
   fill(rightBrightness);
   rect(width/2,0,width/2,height);
-  //
+
+  // set up serial output, to write the control value to the port
   outData = rightBrightness;
   serial.write(outData);
-  // draw the text
+
+  // draw the text - right
   var textRColor = map(rightBrightness, 0, 255, 255,0);
   fill(textRColor);
   textSize(16);
@@ -71,13 +82,13 @@ function draw() {
   textSize(12);
   text("BRIGHTNESS LEVEL: " + rightBrightness, width - 170, 50);
 
-  // draw the separator
+  // draw the separator between frames
   fill(255);
   rect(width/2 - 0.5, 0, 1, height);
 }
 
+// Following functions print the serial communication status to the console for debugging purposes
 
-//
 function printList(portList) {
  // portList is an array of serial port names
  for (var i = 0; i < portList.length; i++) {
